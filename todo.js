@@ -29,6 +29,13 @@ const handleFormSubmit = (e) => {
   const li = document.createElement('li');
   const count = document.querySelectorAll('li');
   const value = input.value;
+  let arrayValue = [];
+  if (input.value.length > 18) {
+    arrayValue = [value];
+    li.innerHTML = `${arrayValue.slice(0, 15)}...`;
+    console.log(arrayValue);
+    return;
+  }
   li.innerHTML = value;
   todoList.appendChild(li);
   todoBox.push(value);
