@@ -1,64 +1,64 @@
-const input = document.querySelector('.Todo-input-box input');
-const todoBtn = document.querySelector('.Todo-submit-btn');
 const todoForm = document.querySelector('.Todo-form');
+const todoInput = todoForm.querySelector('input');
+const todoBtn = document.querySelector('.Todo-submit-btn');
 const todoCount = document.querySelector('.todoCount');
+const ul = document.querySelector('.Todo-list ul');
 
 const STORAGE_NAME = 'TodoList';
-
 const toDoItem = localStorage.getItem(STORAGE_NAME);
 
 let todoBox = [];
 
-if (toDoItem) {
-  const todoList = document.querySelector('.Todo-list');
+const saveTodo = () =>
+  localStorage.setItem(STORAGE_NAME, JSON.stringify(todoBox));
+
+const removeTodos = (e) => {
+  const li = e.target.parentElement;
+  li.remove();
+  todoBox = todoBox.filter((data) => data.id !== parseInt(li.id));
+  saveTodo();
+};
+
+const handleTodo = (data) => {
   const li = document.createElement('li');
-  const count = document.querySelectorAll('li');
-  const value = localStorage.getItem(STORAGE_NAME);
-  li.innerHTML = `${JSON.parse(value)}`;
-  todoList.appendChild(li);
-  todoCount.innerHTML = `( ${count.length + 1} )`;
-}
+  const span = document.createElement('span');
+  const deleteBtn = document.createElement('span');
+  li.id = data.id;
+  deleteBtn.id = 'delete';
+  deleteBtn.innerText = '❌';
+  span.innerText = data.text;
+  deleteBtn.addEventListener('click', removeTodos);
+  li.appendChild(deleteBtn);
+  li.appendChild(span);
+  ul.appendChild(li);
+};
 
 const handleFormSubmit = (e) => {
   e.preventDefault();
-  if (input.value === '') {
-    alert('할 업무를 기입 해주셔야 해요 !');
+  const todoValue = todoInput.value;
+  if (todoValue === '') {
+    alert('공백 금지');
     return;
   }
-  const todoList = document.querySelector('.Todo-list');
-  const li = document.createElement('li');
-  const count = document.querySelectorAll('li');
-  const value = input.value;
-  let arrayValue = [];
-  if (input.value.length > 18) {
-    arrayValue = [value];
-    li.innerHTML = `${arrayValue.slice(0, 15)}...`;
-    console.log(arrayValue);
-    return;
-  }
-  li.innerHTML = value;
-  todoList.appendChild(li);
-  todoBox.push(value);
-  localStorage.setItem(STORAGE_NAME, JSON.stringify(todoBox));
-  todoCount.innerHTML = `( ${count.length + 1} )`;
-  input.value = '';
+  todoInput.value = '';
+  const todoObj = {
+    text: todoValue,
+    id: Date.now(),
+  };
+  todoBox.push(todoObj);
+  handleTodo(todoObj);
+  saveTodo();
 };
 
-const handleBtn = () => {
-  if (input.value === '') {
-    alert('할 업무를 기입 해주셔야 해요 !');
-    return;
-  }
-  const todoList = document.querySelector('.Todo-list');
-  const li = document.createElement('li');
-  const count = document.querySelectorAll('li');
-  const value = input.value;
-  li.innerHTML = value;
-  todoList.appendChild(li);
-  localStorage.setItem(STORAGE_NAME, value);
-  todoCount.innerHTML = `( ${count.length + 1} )`;
-  input.value = '';
+const handleBtn = (e) => {
+  handleFormSubmit(e);
 };
+
+if (toDoItem) {
+  const currentValue = JSON.parse(toDoItem);
+  todoBox = currentValue;
+  currentValue.forEach(handleTodo);
+}
 
 todoForm.addEventListener('submit', handleFormSubmit);
 todoBtn.addEventListener('click', handleBtn);
